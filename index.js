@@ -1,5 +1,11 @@
 import fs from "node:fs";
 import https from "https";
+import { Liquid } from "liquidjs";
+import fv from "@fastify/view";
+import path from "path";
+import * as url from "url";
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -10,12 +16,23 @@ const fastify = Fastify({
   logger: true,
 });
 
+const engine = new Liquid({
+  root: path.join(__dirname, "templates"),
+  extname: ".liquid",
+});
+
+fastify.register(fv, {
+  engine: {
+    liquid: engine,
+  },
+});
+
 fastify.get("/", async (request, reply) => {
-  return { hello: "world" };
+  return reply.view("./templates/index.liquid", { text: "text" });
 });
 
 try {
-  await fastify.listen({ port: 3000 });
+  await fastify.listen({ port: 3001 });
 } catch (err) {
   fastify.log.error(err);
   process.exit(1);
