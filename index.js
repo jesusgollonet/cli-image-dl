@@ -26,13 +26,23 @@ fastify.register(fv, {
   },
 });
 
+const tags = ["bmx", "skatepark", "-scooter"];
 const { flickr } = createFlickr(process.env.FLICKR_API_KEY);
-const res = await getPhotosForTags(["bmx", "skatepark", "-scooter"], 1);
+const res = await getPhotosForTags(tags, 1);
 const allPhotos = res.photos.photo;
 
-fastify.get("/", async (request, reply) => {
+fastify.get("/gallery", async (_, reply) => {
   return reply.view("./templates/index.liquid", {
     images: allPhotos.map((p) => p.url_m),
+  });
+});
+
+fastify.get("/gallery/:page", async (request, reply) => {
+  const { page } = request.params;
+  const res = await getPhotosForTags(tags, page);
+  const images = res.photos.photo.map((p) => p.url_m);
+  return reply.view("./templates/index.liquid", {
+    images,
   });
 });
 
@@ -43,15 +53,12 @@ try {
   process.exit(1);
 }
 
-//import https from "https";
-//import fs from "node:fs";
-
-async function getPhotosForTags(tag, page = 1) {
+async function getPhotosForTags(tags, page = 1) {
   return await flickr("flickr.photos.search", {
-    tags: tag,
+    tags,
     tag_mode: "all",
     extras: ["url_m", "tags"],
-    per_page: 10,
+    per_page: 50,
     page,
   });
 }
