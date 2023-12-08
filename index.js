@@ -2,15 +2,15 @@ import fs from "node:fs";
 import https from "https";
 import { Liquid } from "liquidjs";
 import fv from "@fastify/view";
-import path from "path";
-import * as url from "url";
-const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
-
 import dotenv from "dotenv";
 dotenv.config();
+import path from "path";
+import * as url from "url";
+
 import { createFlickr } from "flickr-sdk";
 import Fastify from "fastify";
 
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 const fastify = Fastify({
   logger: true,
 });
@@ -55,12 +55,6 @@ async function getPhotosForTags(tag, page = 1) {
     page,
   });
 }
-
-console.log(
-  "photos",
-  allPhotos.length,
-  allPhotos.map((p) => p.url_m),
-);
 
 async function downloadFile(url, dest) {
   return new Promise((resolve, reject) => {
