@@ -1,0 +1,12 @@
+{
+  "name": "2023-12-08_10.40.14_flickr-download",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "fastify": "^4.24.3",
+    "flickr-sdk": "^7.0.0-beta.7"
+  }
+}
