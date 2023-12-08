@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import https from "https";
+
 import dotenv from "dotenv";
 dotenv.config();
 import { createFlickr } from "flickr-sdk";
@@ -33,36 +36,35 @@ async function getPhotosForTags(tag, page = 1) {
   });
 }
 
-//const allPhotos = [];
-//// async loop 1 to 10
-//for (let i = 1; i <= 10; i++) {
-//// Your code here
-//let res = await getPhotosForTags(["bmx", "skatepark", "-scooter"], i);
-//allPhotos.push(...res.photos.photo);
-//}
+const res = await getPhotosForTags(["bmx", "skatepark", "-scooter"], 1);
+const allPhotos = res.photos.photo;
 
-//console.log("allPhotos", allPhotos.length, allPhotos);
+console.log(
+  "photos",
+  allPhotos.length,
+  allPhotos.map((p) => p.url_m),
+);
 
-//async function downloadFile(url, dest) {
-//return new Promise((resolve, reject) => {
-//const file = fs.createWriteStream(dest);
-//https
-//.get(url, (response) => {
-//response.pipe(file);
-//file.on("finish", () => {
-//file.close();
-//resolve();
-//});
-//})
-//.on("error", (error) => {
-//fs.unlink(dest);
-//reject(error);
-//});
-//});
-//}
+async function downloadFile(url, dest) {
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(dest);
+    https
+      .get(url, (response) => {
+        response.pipe(file);
+        file.on("finish", () => {
+          file.close();
+          resolve();
+        });
+      })
+      .on("error", (error) => {
+        fs.unlink(dest);
+        reject(error);
+      });
+  });
+}
 
-//for (const photo of allPhotos) {
-//const url = photo.url_m;
-//const dest = `./images/${photo.id}.jpg`;
-//await downloadFile(url, dest);
-//}
+for (const photo of allPhotos) {
+  const url = photo.url_m;
+  const dest = `./images/${photo.id}.jpg`;
+  await downloadFile(url, dest);
+}
