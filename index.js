@@ -4,7 +4,6 @@ import { Liquid } from "liquidjs";
 import fv from "@fastify/view";
 import path from "path";
 import * as url from "url";
-const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
 import dotenv from "dotenv";
@@ -27,10 +26,13 @@ fastify.register(fv, {
   },
 });
 
+const { flickr } = createFlickr(process.env.FLICKR_API_KEY);
+const res = await getPhotosForTags(["bmx", "skatepark", "-scooter"], 1);
+const allPhotos = res.photos.photo;
+
 fastify.get("/", async (request, reply) => {
   return reply.view("./templates/index.liquid", {
-    text: "_____text",
-    cheese: "gouda",
+    images: allPhotos.map((p) => p.url_m),
   });
 });
 
@@ -40,8 +42,6 @@ try {
   fastify.log.error(err);
   process.exit(1);
 }
-
-const { flickr } = createFlickr(process.env.FLICKR_API_KEY);
 
 //import https from "https";
 //import fs from "node:fs";
@@ -55,9 +55,6 @@ async function getPhotosForTags(tag, page = 1) {
     page,
   });
 }
-
-const res = await getPhotosForTags(["bmx", "skatepark", "-scooter"], 1);
-const allPhotos = res.photos.photo;
 
 console.log(
   "photos",

@@ -1,2 +1,6 @@
-<h1>{{cheese}}</h1>
-<p> {{ text}} </p>
+<h1>Gallery</h1>
+<ul>
+    {%- for image in images %}
+        <img src="{{ image }}" alt="image" width="200" height="200">
+    {%- endfor%}
+</ul>
