@@ -28,7 +28,10 @@ fastify.register(fv, {
 });
 
 fastify.get("/", async (request, reply) => {
-  return reply.view("./templates/index.liquid", { text: "text" });
+  return reply.view("./templates/index.liquid", {
+    text: "_____text",
+    cheese: "gouda",
+  });
 });
 
 try {
