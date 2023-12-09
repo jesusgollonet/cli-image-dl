@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import https from "https";
 import { Liquid } from "liquidjs";
+import pkg from "@fastify/static";
+const { default: staticPlugin } = pkg;
 import fv from "@fastify/view";
 import dotenv from "dotenv";
 dotenv.config();
@@ -24,6 +26,9 @@ fastify.register(fv, {
   engine: {
     liquid: engine,
   },
+});
+fastify.register(staticPlugin, {
+  root: path.join(__dirname, "public"),
 });
 
 const tags = ["bmx", "skatepark", "-scooter"];
