@@ -1,93 +1,15 @@
-import fs from "node:fs";
-import https from "https";
-import { Liquid } from "liquidjs";
-import pkg from "@fastify/static";
-const { default: staticPlugin } = pkg;
-import fv from "@fastify/view";
-import dotenv from "dotenv";
-dotenv.config();
-import path from "path";
-import * as url from "url";
-
-import { createFlickr } from "flickr-sdk";
-import Fastify from "fastify";
-
-const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
-const fastify = Fastify({
-  logger: true,
-});
-
-const engine = new Liquid({
-  root: path.join(__dirname, "templates"),
-  extname: ".liquid",
-});
-
-fastify.register(fv, {
-  engine: {
-    liquid: engine,
-  },
-});
-fastify.register(staticPlugin, {
-  root: path.join(__dirname, "public"),
-});
+import { getPhotosForTags, downloadFile } from "./src/downloader.js";
+import { CreateServer } from "./src/server.js";
 
 const tags = ["bmx", "skatepark", "-scooter"];
-const { flickr } = createFlickr(process.env.FLICKR_API_KEY);
+
 const res = await getPhotosForTags(tags, 1);
 const allPhotos = res.photos.photo;
 
-fastify.get("/gallery", async (_, reply) => {
-  return reply.view("./templates/index.liquid", {
-    images: allPhotos.map((p) => p.url_m),
-  });
-});
+//for (const photo of allPhotos) {
+//const url = photo.url_m;
+//const dest = `./images/${photo.id}.jpg`;
+//await downloadFile(url, dest);
+//}
 
-fastify.get("/gallery/:page", async (request, reply) => {
-  const { page } = request.params;
-  const res = await getPhotosForTags(tags, page);
-  const images = res.photos.photo.map((p) => p.url_m);
-  return reply.view("./templates/index.liquid", {
-    images,
-  });
-});
-
-try {
-  await fastify.listen({ port: 3001 });
-} catch (err) {
-  fastify.log.error(err);
-  process.exit(1);
-}
-
-async function getPhotosForTags(tags, page = 1) {
-  return await flickr("flickr.photos.search", {
-    tags,
-    tag_mode: "all",
-    extras: ["url_m", "tags"],
-    per_page: 50,
-    page,
-  });
-}
-
-async function downloadFile(url, dest) {
-  return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(dest);
-    https
-      .get(url, (response) => {
-        response.pipe(file);
-        file.on("finish", () => {
-          file.close();
-          resolve();
-        });
-      })
-      .on("error", (error) => {
-        fs.unlink(dest);
-        reject(error);
-      });
-  });
-}
-
-for (const photo of allPhotos) {
-  const url = photo.url_m;
-  const dest = `./images/${photo.id}.jpg`;
-  await downloadFile(url, dest);
-}
+CreateServer(allPhotos.map((p) => p.url_m));
