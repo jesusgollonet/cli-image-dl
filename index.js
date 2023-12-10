@@ -4,12 +4,13 @@ import { CreateServer } from "./src/server.js";
 const tags = ["bmx", "skatepark", "-scooter"];
 
 const res = await getPhotosForTags(tags, 1);
-const allPhotos = res.photos.photo;
 
-//for (const photo of allPhotos) {
-//const url = photo.url_m;
-//const dest = `./images/${photo.id}.jpg`;
-//await downloadFile(url, dest);
-//}
+function createGalleryFunction(tags) {
+  return async function (page) {
+    const res = await getPhotosForTags(tags, page);
+    return res.photos.photo.map((p) => p.url_m);
+  };
+}
 
-CreateServer(allPhotos.map((p) => p.url_m));
+const populatePageFunction = createGalleryFunction(tags);
+CreateServer(populatePageFunction);
