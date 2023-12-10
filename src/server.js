@@ -31,7 +31,7 @@ export async function CreateServer(populatePageFunction) {
     root: path.join(__dirname, "./../public"),
   });
 
-  fastify.get "/gallery/:page?", async (request, reply) => {
+  fastify.get("/gallery/:page?", async (request, reply) => {
     const { page } = request.params || 1;
     const images = await populatePageFunction(page);
     console.log(images);
