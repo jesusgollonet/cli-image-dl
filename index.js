@@ -4,6 +4,7 @@ import { getPhotosForTags } from "./src/downloader.js";
 import { CreateServer } from "./src/server.js";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import open from "open";
 
 function createGalleryFunction(tags) {
   return async function (page) {
@@ -24,11 +25,14 @@ yargs(hideBin(process.argv))
         demandOption: false,
       });
     },
-    (argv) => {
+    async (argv) => {
       const { tags } = argv;
       if (tags) {
+        console.log(tags);
         const populatePageFunction = createGalleryFunction(tags);
-        CreateServer(populatePageFunction);
+        await CreateServer(populatePageFunction);
+        open("http://localhost:3001/gallery", { wait: true });
+        console.log("after server");
       } else {
         console.log("no tags!");
       }

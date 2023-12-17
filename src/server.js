@@ -41,7 +41,7 @@ export async function CreateServer(populatePageFunction) {
   });
 
   try {
-    await fastify.listen({ port: 3001 });
+    return fastify.listen({ port: 3001 });
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
