@@ -1,7 +1,10 @@
 {
-  "name": "2023-12-08_10.40.14_flickr-download",
-  "version": "1.0.0",
+  "name": "flck",
+  "version": "0.0.1",
   "main": "index.js",
+  "bin": {
+    "flck": "./index.js"
+  },
   "type": "module",
   "license": "MIT",
   "scripts": {
